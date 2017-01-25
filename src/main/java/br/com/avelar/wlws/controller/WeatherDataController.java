@@ -57,7 +57,7 @@ public class WeatherDataController {
     }
     
     @CrossOrigin
-    @RequestMapping(value = "/last", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<WeatherData> retrieveData() {
         WeatherData lastData = weatherDataService.findLast();
         

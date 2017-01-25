@@ -29,6 +29,9 @@ public class WeatherDataService {
     
     public WeatherData findLast() {
         List<WeatherData> all = dao.findAll();
+        
+        if(all.isEmpty()) return null;
+        
         return all.get(all.size() - 1);
     }
     

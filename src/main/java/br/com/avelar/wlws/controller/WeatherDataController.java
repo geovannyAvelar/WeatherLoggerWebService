@@ -42,7 +42,7 @@ public class WeatherDataController {
         binder.addValidators(weatherDataValidator);
     }
     
-	@CrossOrigin
+    @CrossOrigin
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Void> saveData(@Valid @RequestBody WeatherData data, Errors errors) {
         

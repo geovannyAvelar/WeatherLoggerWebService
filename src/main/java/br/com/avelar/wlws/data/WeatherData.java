@@ -14,6 +14,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
 @Table(name = "WEATHER_DATA")
@@ -28,6 +29,7 @@ public class WeatherData {
     
     @Column(name = "DATE")
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     private Date date;
     
     @Column(name  = "TEMPERATURE")

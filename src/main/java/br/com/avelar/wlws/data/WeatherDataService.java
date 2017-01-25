@@ -11,7 +11,7 @@ public class WeatherDataService {
     @Autowired
     private WeatherDataDao dao;
     
-    public WeatherData save(WeatherData data) {
+    public WeatherData save(WeatherData data) {    	
         return dao.save(data);
     }
     

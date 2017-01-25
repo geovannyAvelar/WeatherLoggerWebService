@@ -12,7 +12,11 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import br.com.avelar.wlws.data.TemperatureUnit;
 import br.com.avelar.wlws.data.WeatherData;
 import br.com.avelar.wlws.data.WeatherDataService;
@@ -63,12 +67,9 @@ public class WeatherDataControllerTest {
         
         MockMvc mock = standaloneSetup(controller).build();
         
-        mock.perform(post("/weather/save")
-                          .param("date", "2016-11-5T00:00:00")
-                          .param("temperature", "24")
-                          .param("relativeHumidity", "57")
-                          .param("temperatureUnit", "CELSIUS")
-                          .param("dewPoint", "15"))
+        mock.perform(post("/weather")
+        		.contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(notSaved)))
             .andExpect(status().isOk());
     }
 
@@ -93,7 +94,7 @@ public class WeatherDataControllerTest {
         
         MockMvc mock = standaloneSetup(controller).build();
         
-        mock.perform(get("/weather/retrieve/2016-11-01/2016-11-11/"))
+        mock.perform(get("/weather/2016-11-01/2016-11-11/"))
                 .andExpect(status().isOk());
         
     }
@@ -115,7 +116,7 @@ public class WeatherDataControllerTest {
         
         MockMvc mock = standaloneSetup(controller).build();
         
-        mock.perform(get("/weather/retrieve/last/"))
+        mock.perform(get("/weather/last/"))
                 .andExpect(status().isOk());
     }
     

@@ -28,7 +28,6 @@ public class WeatherData {
     
     @Column(name = "DATE")
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @NotNull
     private Date date;
     
     @Column(name  = "TEMPERATURE")
@@ -94,15 +93,6 @@ public class WeatherData {
 
     public void setDewPoint(Double dewPoint) {
         this.dewPoint = dewPoint;
-    }
-
-    public boolean equals(Object object) {
-        if(!(object instanceof WeatherData)) return false;
-        
-        WeatherData weatherData = (WeatherData) object;
-        
-        if(!weatherData.getDate().equals(this.date)) return false;
-        return true;
     }
     
     public String toString() {

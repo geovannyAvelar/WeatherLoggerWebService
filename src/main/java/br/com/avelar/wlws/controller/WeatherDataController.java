@@ -2,7 +2,9 @@ package br.com.avelar.wlws.controller;
 
 import java.util.Date;
 import java.util.List;
+
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -12,9 +14,11 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
 import br.com.avelar.wlws.data.WeatherData;
 import br.com.avelar.wlws.data.WeatherDataService;
 import br.com.avelar.wlws.data.WeatherDataValidator;
@@ -39,20 +43,21 @@ public class WeatherDataController {
     }
     
 	@CrossOrigin
-    @RequestMapping(value = "/save", method = RequestMethod.POST)
-    public ResponseEntity<Void> saveData(@Valid WeatherData data, Errors errors) {
+    @RequestMapping(method = RequestMethod.POST)
+    public ResponseEntity<Void> saveData(@Valid @RequestBody WeatherData data, Errors errors) {
         
         if(errors.hasErrors()) {
             return new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
         }
         
+        data.setDate(new Date());
         weatherDataService.save(data);
         
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
     
     @CrossOrigin
-    @RequestMapping(value = "/retrieve/last", method = RequestMethod.GET)
+    @RequestMapping(value = "/last", method = RequestMethod.GET)
     public ResponseEntity<WeatherData> retrieveData() {
         WeatherData lastData = weatherDataService.findLast();
         
@@ -65,7 +70,7 @@ public class WeatherDataController {
     }
     
     @CrossOrigin
-    @RequestMapping(value = "/retrieve/{day}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{day}", method = RequestMethod.GET)
     public ResponseEntity<List<WeatherData>> retrieveData(@DateTimeFormat(pattern="yyyy-MM-dd") 
                                                             @PathVariable Date day) {
         List<WeatherData> data = weatherDataService.findByDay(day);
@@ -74,7 +79,7 @@ public class WeatherDataController {
     
     
     @CrossOrigin
-    @RequestMapping(value = "/retrieve/{from}/{to}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{from}/{to}", method = RequestMethod.GET)
     public ResponseEntity<List<WeatherData>> retrieveData(@DateTimeFormat(pattern="yyyy-MM-dd") 
                                                             @PathVariable  Date from,
                                                            @DateTimeFormat(pattern="yyyy-MM-dd")

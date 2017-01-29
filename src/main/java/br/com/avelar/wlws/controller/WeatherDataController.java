@@ -2,11 +2,10 @@ package br.com.avelar.wlws.controller;
 
 import java.util.Date;
 import java.util.List;
-
 import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -18,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
 import br.com.avelar.wlws.data.WeatherData;
 import br.com.avelar.wlws.data.WeatherDataService;
 import br.com.avelar.wlws.data.WeatherDataValidator;
+import br.com.avelar.wlws.helpers.HttpHeadersHelper;
 
 @RestController
 @RequestMapping("/weather")
@@ -37,55 +36,84 @@ public class WeatherDataController {
         this.weatherDataService = weatherDataService;
     }
     
-    @InitBinder
+    @InitBinder("weatherData")
     public void initBinder(WebDataBinder binder) {
         binder.addValidators(weatherDataValidator);
     }
     
     @CrossOrigin
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<Void> saveData(@Valid @RequestBody WeatherData data, Errors errors) {
+    public ResponseEntity<Void> saveData(@Valid @RequestBody WeatherData data, 
+    														 Errors errors,
+    														 HttpHeadersHelper httpHeadersHelper) {
+    	HttpHeaders headers = null;
         
         if(errors.hasErrors()) {
             return new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
         }
         
-        data.setDate(new Date());
-        weatherDataService.save(data);
-        
-        return new ResponseEntity<Void>(HttpStatus.OK);
-    }
-    
-    @CrossOrigin
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<WeatherData> retrieveData() {
-        WeatherData lastData = weatherDataService.findLast();
-        
-        if(lastData == null) {
-            return new ResponseEntity<WeatherData>(HttpStatus.NOT_FOUND);
+        if(data.getId() != null) {
+        	headers = httpHeadersHelper.addLocationHeader("/weather", data.getId());
+        	return new ResponseEntity<Void>(headers, HttpStatus.CONFLICT);
         }
         
-        return new ResponseEntity<WeatherData>(lastData, HttpStatus.OK);
-        
+        WeatherData savedData = weatherDataService.save(data);
+        headers = httpHeadersHelper.addLocationHeader("/weather", savedData.getId());
+        return new ResponseEntity<Void>(headers, HttpStatus.CREATED); 
     }
     
     @CrossOrigin
-    @RequestMapping(value = "/{day}", method = RequestMethod.GET)
-    public ResponseEntity<List<WeatherData>> retrieveData(@DateTimeFormat(pattern="yyyy-MM-dd") 
-                                                            @PathVariable Date day) {
+    @RequestMapping(value = "/last", method = RequestMethod.GET)
+    public ResponseEntity<WeatherData> findData() {
+    	WeatherData data = weatherDataService.findLast();
+    	
+    	if(data == null) {
+    		return new ResponseEntity<WeatherData>(HttpStatus.NOT_FOUND);
+    	}
+    	
+    	return new ResponseEntity<WeatherData>(data, HttpStatus.OK);
+    }
+    
+    @CrossOrigin
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public ResponseEntity<WeatherData> findData(@PathVariable Long id) {
+    	WeatherData data = weatherDataService.findOne(id);
+    	
+    	if(data == null) {
+    		return new ResponseEntity<WeatherData>(HttpStatus.NOT_FOUND);
+    	}
+    	
+    	return new ResponseEntity<WeatherData>(data, HttpStatus.OK);
+    }
+    
+    @CrossOrigin
+    @RequestMapping(value = "/day/{day}", method = RequestMethod.GET)
+    public ResponseEntity<List<WeatherData>> findData(@DateTimeFormat(pattern="yyyy-MM-dd") 
+                                                      @PathVariable Date day) {
         List<WeatherData> data = weatherDataService.findByDay(day);
         return new ResponseEntity<List<WeatherData>>(data, HttpStatus.OK);
     }
     
-    
     @CrossOrigin
-    @RequestMapping(value = "/{from}/{to}", method = RequestMethod.GET)
-    public ResponseEntity<List<WeatherData>> retrieveData(@DateTimeFormat(pattern="yyyy-MM-dd") 
+    @RequestMapping(value = "/period/{from}/{to}", method = RequestMethod.GET)
+    public ResponseEntity<List<WeatherData>> findData(@DateTimeFormat(pattern="yyyy-MM-dd") 
                                                             @PathVariable  Date from,
                                                            @DateTimeFormat(pattern="yyyy-MM-dd")
                                                             @PathVariable  Date to) {
         List<WeatherData> weatherDataList = weatherDataService.findByRange(from, to);
         return new ResponseEntity<List<WeatherData>>(weatherDataList, HttpStatus.OK);
+    }
+    
+    @CrossOrigin
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Void> deleteData(@PathVariable Long id) {
+    	WeatherData data = weatherDataService.findOne(id);
+    	
+    	if(data == null) {
+    		return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+    	}
+    	
+    	return new ResponseEntity<Void>(HttpStatus.OK);
     }
     
 }

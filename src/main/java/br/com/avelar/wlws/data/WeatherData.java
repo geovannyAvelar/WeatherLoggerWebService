@@ -49,6 +49,10 @@ public class WeatherData {
     @NotNull
     private Double dewPoint;
 
+    public WeatherData() {
+    	this.date = new Date();
+    }
+    
     public Long getId() {
         return id;
     }

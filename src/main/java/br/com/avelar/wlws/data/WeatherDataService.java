@@ -1,8 +1,10 @@
 package br.com.avelar.wlws.data;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import br.com.avelar.wlws.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
@@ -11,7 +13,7 @@ public class WeatherDataService {
     @Autowired
     private WeatherDataDao dao;
     
-    public WeatherData save(WeatherData data) {    	
+    public WeatherData save(WeatherData data) {
         return dao.save(data);
     }
     
@@ -20,11 +22,13 @@ public class WeatherDataService {
     }
     
     public List<WeatherData> findByDay(Date date) {
-        return dao.findByDateOrderByDateAsc(date);
+    	Date finalDate = DateUtils.sumDate(date, Calendar.DAY_OF_MONTH, 1);
+        return dao.findByDateBetweenOrderByDateAsc(date, finalDate);
     }
     
     public List<WeatherData> findByRange(Date from, Date to) {
-        return dao.findByDateBetweenOrderByDateAsc(from, to);
+    	Date finalDate = DateUtils.sumDate(to, Calendar.DAY_OF_MONTH, 1);
+        return dao.findByDateBetweenOrderByDateAsc(from, finalDate);
     }
     
     public WeatherData findLast() {
@@ -37,6 +41,10 @@ public class WeatherDataService {
     
     public List<WeatherData> findAll() {
         return dao.findAll();
+    }
+    
+    public boolean exists(Long id) {
+    	return dao.findOne(id) != null;
     }
     
     public void delete(WeatherData data) {

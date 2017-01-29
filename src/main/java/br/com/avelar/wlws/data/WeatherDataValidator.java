@@ -9,7 +9,7 @@ public class WeatherDataValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return clazz.isAssignableFrom(WeatherData.class);
+        return WeatherData.class.equals(clazz);
     }
 
     @Override

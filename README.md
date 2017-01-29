@@ -8,7 +8,7 @@ Arduino weather station project web service
         * 1.2.1 JDK version
         * 1.2.2 Database
     * 1.3 Build
- * 2 License
+* 2 License
 
 ## 1 Build
 

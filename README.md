@@ -8,7 +8,7 @@ Arduino weather station project web service
         * 1.2.1 JDK version
         * 1.2.2 Database
     * 1.3 Build
-    * 1.4 License
+ * 2 License
 
 ## 1 Build
 
@@ -44,5 +44,5 @@ To configure the connection of SocialCRON with your MySQL database, open the fil
 
 4. The depedencies will be resolved and a file named SocialCRON-X.war will be generated on target directory, 'X' is the version name. Now you should deploy this .war file on a application server, like Tomcat.
 
-### 1.4 License
+## 2 License
 This project is under The MIT License (MIT) terms.

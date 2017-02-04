@@ -29,7 +29,7 @@ public class WeatherData {
     
     @Column(name = "DATE")
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZ")
     private Date date;
     
     @Column(name  = "TEMPERATURE")

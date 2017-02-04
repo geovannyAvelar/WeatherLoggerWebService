@@ -2,7 +2,9 @@ package br.com.avelar.wlws.controller;
 
 import java.util.Date;
 import java.util.List;
+
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
@@ -17,10 +19,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
 import br.com.avelar.wlws.data.WeatherData;
 import br.com.avelar.wlws.data.WeatherDataService;
 import br.com.avelar.wlws.data.WeatherDataValidator;
 import br.com.avelar.wlws.helpers.HttpHeadersHelper;
+import br.com.avelar.wlws.statistics.WeatherStatistics;
 
 @RestController
 @RequestMapping("/weather")
@@ -88,20 +92,35 @@ public class WeatherDataController {
     
     @CrossOrigin
     @RequestMapping(value = "/day/{day}", method = RequestMethod.GET)
-    public ResponseEntity<List<WeatherData>> findData(@DateTimeFormat(pattern="yyyy-MM-dd") 
-                                                      @PathVariable Date day) {
-        List<WeatherData> data = weatherDataService.findByDay(day);
-        return new ResponseEntity<List<WeatherData>>(data, HttpStatus.OK);
+    public ResponseEntity<WeatherStatistics> findData(@DateTimeFormat(pattern="yyyy-MM-dd") 
+                                                      @PathVariable Date day,
+                                                      WeatherStatistics statistics) {
+    	List<WeatherData> weatherData = weatherDataService.findByDay(day);
+    	
+    	if(weatherData.isEmpty()) {
+    		return new ResponseEntity<WeatherStatistics>(HttpStatus.NOT_FOUND);
+    	}
+    	
+    	statistics.calculateStatistics(weatherData);
+        return new ResponseEntity<WeatherStatistics>(statistics, HttpStatus.OK);
     }
     
     @CrossOrigin
     @RequestMapping(value = "/period/{from}/{to}", method = RequestMethod.GET)
-    public ResponseEntity<List<WeatherData>> findData(@DateTimeFormat(pattern="yyyy-MM-dd") 
+    public ResponseEntity<WeatherStatistics> findData(@DateTimeFormat(pattern="yyyy-MM-dd") 
                                                             @PathVariable  Date from,
                                                            @DateTimeFormat(pattern="yyyy-MM-dd")
-                                                            @PathVariable  Date to) {
+                                                            @PathVariable  Date to,
+                                                            	WeatherStatistics statistics) {
         List<WeatherData> weatherDataList = weatherDataService.findByRange(from, to);
-        return new ResponseEntity<List<WeatherData>>(weatherDataList, HttpStatus.OK);
+        
+        if(weatherDataList.isEmpty()) {
+        	return new ResponseEntity<WeatherStatistics>(HttpStatus.NOT_FOUND);
+        }
+        
+        
+        statistics.calculateStatistics(weatherDataList);
+        return new ResponseEntity<WeatherStatistics>(statistics, HttpStatus.OK);
     }
     
     @CrossOrigin

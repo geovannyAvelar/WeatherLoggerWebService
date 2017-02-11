@@ -8,9 +8,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-
 import br.com.avelar.wlws.data.WeatherData;
 
 @Component
@@ -27,13 +25,19 @@ public class WeatherStatistics {
 	
 	private double maximumTemperature;
 	
+	private double averageTemperature;
+	
 	private double minimumHumidity;
 	
 	private double maximumHumidity;
 	
+	private double averageHumidity;
+	
 	private double minimumDewPoint;
 	
 	private double maximumDewPoint;
+
+	private double averageDewPoint;
 	
 	private List<WeatherData> data;
 	
@@ -43,6 +47,18 @@ public class WeatherStatistics {
 
 	public Date getLastDate() {
 		return lastDate;
+	}
+
+	public double getAverageTemperature() {
+		return averageTemperature;
+	}
+
+	public double getAverageHumidity() {
+		return averageHumidity;
+	}
+
+	public double getAverageDewPoint() {
+		return averageDewPoint;
 	}
 
 	public double getMinimumTemperature() {
@@ -80,39 +96,44 @@ public class WeatherStatistics {
 			throw new IllegalArgumentException("Cannot calculate statistics. Null list");
 		}
 		
-		data = weatherDataList;
-		List<Date> dates = new ArrayList<Date>();
-		List<Double> temperatures = new ArrayList<Double>();
-		List<Double> humidities = new ArrayList<Double>();
-		List<Double> dewPoints = new ArrayList<Double>();
-		
-		for(WeatherData weatherData : weatherDataList) {
-			dates.add(weatherData.getDate());
-			temperatures.add(weatherData.getTemperature());
-			humidities.add(weatherData.getRelativeHumidity());
-			dewPoints.add(weatherData.getDewPoint());
+		if(weatherDataList.size() > 0) {
+			data = weatherDataList;
+			List<Date> dates = new ArrayList<Date>();
+			List<Double> temperatures = new ArrayList<Double>();
+			List<Double> humidities = new ArrayList<Double>();
+			List<Double> dewPoints = new ArrayList<Double>();
+			
+			double sumTemperature = 0.0;
+			double sumHumidity = 0.0;
+			double sumDewPoint = 0.0;
+			
+			for(WeatherData weatherData : weatherDataList) {
+				dates.add(weatherData.getDate());
+				temperatures.add(weatherData.getTemperature());
+				humidities.add(weatherData.getRelativeHumidity());
+				dewPoints.add(weatherData.getDewPoint());
+				sumTemperature += weatherData.getTemperature();
+				sumHumidity += weatherData.getRelativeHumidity();
+				sumDewPoint += weatherData.getDewPoint();
+			}
+			
+			this.firstDate = Collections.min(dates);
+			this.lastDate = Collections.max(dates);
+			
+			this.minimumTemperature = Collections.min(temperatures);
+			this.maximumTemperature = Collections.max(temperatures);
+			this.averageTemperature = sumTemperature / temperatures.size();
+			
+			
+			this.minimumHumidity = Collections.min(humidities);
+			this.maximumHumidity = Collections.max(humidities);
+			this.averageHumidity = sumHumidity / humidities.size();
+			
+			this.minimumDewPoint = Collections.min(dewPoints);
+			this.maximumDewPoint = Collections.max(dewPoints);
+			this.averageDewPoint = sumDewPoint / dewPoints.size();
 		}
 		
-		if(dates.size() > 0) {
-			firstDate = Collections.min(dates);
-			lastDate = Collections.max(dates);
-		}
-		
-		if(temperatures.size() > 0) {
-			minimumTemperature = Collections.min(temperatures);
-			maximumTemperature = Collections.max(temperatures);
-		}
-		
-		if(humidities.size() > 0) {
-			minimumHumidity = Collections.min(humidities);
-			maximumHumidity = Collections.max(humidities);
-		}
-
-		if(dewPoints.size() > 0) {
-			minimumDewPoint = Collections.min(dewPoints);
-			maximumDewPoint = Collections.max(dewPoints);
-		}
-
 	}
 	
 }
